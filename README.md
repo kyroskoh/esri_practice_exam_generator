@@ -13,7 +13,14 @@ This project is **not affiliated with Esri** or any certification body, partner,
 
 Open the linked README for exam structure, question counts, how to run the test, and how to add questions.
 
-## Quick start
+## Practice online (GitHub Pages)
+
+Direct links to the standalone practice tests (question bank embedded in the page):
+
+- [ArcGIS Pro Foundation 2025 (EAPF_2025) — practice test](https://kyroskoh.github.io/esri_practice_exam_generator/arcgis_pro_foundation_2025/practice-test-standalone.html)
+- [ArcGIS Enterprise Administration Professional 2025 (EAEP_2025) — practice test](https://kyroskoh.github.io/esri_practice_exam_generator/arcgis_enterprise_administration_professional_2025/practice-test-standalone.html)
+
+## Quick start (local)
 
 1. Open the exam folder.
 2. Open **`practice-test-standalone.html`** in a browser (double-click or drag into the window). The question bank is embedded; no web server or file picker is required.
