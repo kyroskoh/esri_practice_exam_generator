@@ -1,0 +1,61 @@
+{
+  "examId": "EAEP_2025",
+  "title": "ArcGIS Enterprise Administration Professional 2025",
+  "certificationCode": "EAEP 2025",
+  "version": "2025",
+  "source": "EAEP2025_EIG_JAN2026.pdf",
+  "details": {
+    "questionCount": 75,
+    "durationMinutes": 105,
+    "format": "Multiple Choice",
+    "language": "English"
+  },
+  "domains": [
+    {
+      "id": "deploy-enterprise",
+      "name": "Deploy ArcGIS Enterprise",
+      "weightPercent": 34,
+      "objectives": [
+        "Apply Esri guidelines to install and configure an ArcGIS Enterprise deployment",
+        "Apply Esri best practices to configure security for ArcGIS Enterprise",
+        "Apply procedural concepts to authorize ArcGIS Enterprise",
+        "Determine the appropriate ArcGIS Server roles",
+        "Determine the appropriate ArcGIS Data Store types",
+        "Explain how to configure ArcGIS Enterprise portal organization settings"
+      ]
+    },
+    {
+      "id": "troubleshoot-enterprise",
+      "name": "Troubleshoot ArcGIS Enterprise",
+      "weightPercent": 18,
+      "objectives": [
+        "Troubleshoot functional issues between ArcGIS Enterprise components",
+        "Interpret ArcGIS Enterprise logs to determine the causes of issues",
+        "Troubleshoot performance issues"
+      ]
+    },
+    {
+      "id": "maintain-support-enterprise",
+      "name": "Maintain and Support ArcGIS Enterprise",
+      "weightPercent": 22,
+      "objectives": [
+        "Determine how to perform system health checks and maintain stability",
+        "Apply best practices to conduct backups and restorations",
+        "Apply procedural concepts to optimize services",
+        "Apply Esri guidelines to upgrade ArcGIS Enterprise"
+      ]
+    },
+    {
+      "id": "manage-content-users",
+      "name": "Manage Content and Users in ArcGIS Enterprise",
+      "weightPercent": 26,
+      "objectives": [
+        "Explain how to configure service capabilities and properties to meet user requirements",
+        "Explain how to register on-premises or cloud-based data sources with ArcGIS Enterprise",
+        "Explain how to manage groups and content",
+        "Explain how to manage users",
+        "Explain how to set up and manage distributed collaborations"
+      ]
+    }
+  ]
+}

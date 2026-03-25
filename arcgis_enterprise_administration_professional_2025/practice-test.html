@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EAEP 2025 – Practice Test | ArcGIS Enterprise Administration</title>
+  <style>
+    :root {
+      --bg: #1a1d23;
+      --surface: #252830;
+      --text: #e6e8ec;
+      --muted: #8b909a;
+      --accent: #00a3e0;
+      --correct: #2d8f6f;
+      --incorrect: #c45c4c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 1rem;
+      line-height: 1.5;
+    }
+    .container { max-width: 42rem; margin: 0 auto; }
+    h1 { font-size: 1.25rem; font-weight: 600; margin: 0 0 0.25rem; }
+    .meta { font-size: 0.875rem; color: var(--muted); margin-bottom: 1.5rem; }
+    .domain-tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+    .question-block {
+      background: var(--surface);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .question-text { font-weight: 500; margin-bottom: 1rem; }
+    .options { list-style: none; padding: 0; margin: 0; }
+    .options li { margin-bottom: 0.5rem; }
+    .options label {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 6px;
+    }
+    .options label:hover { background: rgba(255,255,255,0.04); }
+    .options input { margin-top: 0.2rem; flex-shrink: 0; }
+    .options .opt-key { flex-shrink: 0; font-weight: 600; color: var(--muted); }
+    .options .opt-text { flex: 1; }
+    .options .result {
+      font-size: 0.8rem;
+      margin-left: 0.5rem;
+    }
+    .options .result.correct { color: var(--correct); }
+    .options .result.incorrect { color: var(--incorrect); }
+    .actions { margin-top: 1.5rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    button {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    button:hover { filter: brightness(1.1); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .score-card {
+      background: var(--surface);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid var(--accent);
+    }
+    .score-card h2 { font-size: 1rem; margin: 0 0 0.5rem; }
+    .score-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    footer { margin-top: 2rem; font-size: 0.75rem; color: var(--muted); }
+    .load-error {
+      background: var(--surface);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      color: var(--muted);
+      border-left: 4px solid var(--incorrect);
+    }
+    .load-error code { background: rgba(255,255,255,0.08); padding: 0.2em 0.4em; border-radius: 4px; font-size: 0.9em; }
+    .load-error input[type="file"] { margin-top: 0.5rem; color: var(--text); font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>ArcGIS Enterprise Administration Professional 2025 (EAEP_2025) – Practice Test</h1>
+    <p class="meta" id="meta-line">Loading question bank… · 75 questions per exam / 105 min in real exam · Multiple choice</p>
+
+    <div id="questions-root"></div>
+    <div id="score-root" class="score-card" hidden></div>
+    <div class="actions">
+      <button type="button" id="btn-new-exam" style="background: var(--surface); color: var(--text);">New exam (random 75)</button>
+      <button type="button" id="btn-submit">Submit answers</button>
+      <button type="button" id="btn-reset" style="background: var(--surface); color: var(--text);">Reset answers</button>
+    </div>
+    <footer>
+      Exam structure from EAEP2025_EIG_JAN2026.pdf. Questions 1–10 in the bank are from <a href="https://www.certfun.com/esri/esri-arcgis-enterprise-administration-professional-eaep-2025-certification-sample-questions" style="color: var(--accent);">CertFun EAEP_2025 sample questions</a> (four options each). Not affiliated with Esri. Developer: Kyros.
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      var QUESTIONS_JSON = 'questions.json';
+      var EXAM_SPEC = {"examId":"EAEP_2025","title":"ArcGIS Enterprise Administration Professional 2025","certificationCode":"EAEP 2025","version":"2025","source":"EAEP2025_EIG_JAN2026.pdf","details":{"questionCount":75,"durationMinutes":105,"format":"Multiple Choice","language":"English"},"domains":[{"id":"deploy-enterprise","name":"Deploy ArcGIS Enterprise","weightPercent":34,"objectives":[]},{"id":"troubleshoot-enterprise","name":"Troubleshoot ArcGIS Enterprise","weightPercent":18,"objectives":[]},{"id":"maintain-support-enterprise","name":"Maintain and Support ArcGIS Enterprise","weightPercent":22,"objectives":[]},{"id":"manage-content-users","name":"Manage Content and Users in ArcGIS Enterprise","weightPercent":26,"objectives":[]}]};
+      var EXAM_QUESTION_COUNT = 75;
+      var EXAM_DURATION_MIN = EXAM_SPEC.details.durationMinutes;
+      var questionBank = [];
+      var currentQuestions = [];
+
+      var domainNames = {};
+      EXAM_SPEC.domains.forEach(function (d) { domainNames[d.id] = d.name; });
+
+      function shuffleArray(arr) {
+        var a = arr.slice();
+        for (var i = a.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = a[i];
+          a[i] = a[j];
+          a[j] = t;
+        }
+        return a;
+      }
+
+      function pickRandomSubset(arr, n) {
+        var copy = arr.slice();
+        if (copy.length <= n) return copy;
+        shuffleArray(copy);
+        return copy.slice(0, n);
+      }
+
+      function buildExamSet() {
+        var subset = pickRandomSubset(questionBank, EXAM_QUESTION_COUNT);
+        var displayKeys = ['a', 'b', 'c', 'd'];
+        return shuffleArray(subset).map(function (q) {
+          var shuffled = shuffleArray(q.options.slice());
+          var correctIndex = -1;
+          for (var i = 0; i < shuffled.length; i++) {
+            if (shuffled[i].key === q.correctKey) {
+              correctIndex = i;
+              break;
+            }
+          }
+          var options = shuffled.map(function (opt, i) {
+            return { key: displayKeys[i], text: opt.text };
+          });
+          var correctKey = correctIndex >= 0 ? displayKeys[correctIndex] : q.correctKey;
+          return {
+            id: q.id,
+            domainId: q.domainId,
+            text: q.text,
+            correctKey: correctKey,
+            options: options
+          };
+        });
+      }
+
+      function updateMetaLine() {
+        var el = document.getElementById('meta-line');
+        if (!el) return;
+        el.textContent = 'Bank: ' + questionBank.length + ' questions · This exam: ' + currentQuestions.length + ' (random ' + EXAM_QUESTION_COUNT + ') · ' + EXAM_DURATION_MIN + ' min in real exam · Multiple choice';
+      }
+
+      function render(questions) {
+        var root = document.getElementById('questions-root');
+        root.innerHTML = '';
+        var list = questions || currentQuestions;
+        list.forEach(function (q, idx) {
+          var domainName = domainNames[q.domainId] || q.domainId;
+          var block = document.createElement('div');
+          block.className = 'question-block';
+          block.dataset.questionId = q.id;
+          var optList = q.options.map(function (opt) {
+            return '<li><label><input type="radio" name="' + q.id + '" value="' + opt.key + '"><span class="opt-key">' + opt.key + ')</span><span class="opt-text">' + escapeHtml(opt.text) + '</span><span class="result" data-key="' + opt.key + '"></span></label></li>';
+          }).join('');
+          block.innerHTML =
+            '<span class="domain-tag">' + escapeHtml(domainName) + '</span>' +
+            '<div class="question-text">' + (idx + 1) + '. ' + escapeHtml(q.text) + '</div>' +
+            '<ul class="options">' + optList + '</ul>';
+          root.appendChild(block);
+        });
+      }
+
+      function escapeHtml(s) {
+        var div = document.createElement('div');
+        div.textContent = s;
+        return div.innerHTML;
+      }
+
+      function getAnswers() {
+        var out = {};
+        currentQuestions.forEach(function (q) {
+          var el = document.querySelector('input[name="' + q.id + '"]:checked');
+          out[q.id] = el ? el.value : null;
+        });
+        return out;
+      }
+
+      function showResults(answers) {
+        var correct = 0;
+        currentQuestions.forEach(function (q) {
+          var block = document.querySelector('.question-block[data-question-id="' + q.id + '"]');
+          var opts = block.querySelectorAll('.options .result');
+          opts.forEach(function (span) {
+            span.textContent = '';
+            span.className = 'result';
+            var key = span.dataset.key;
+            if (key !== q.correctKey && key === answers[q.id]) {
+              span.textContent = ' Incorrect';
+              span.className = 'result incorrect';
+            } else if (key === q.correctKey) {
+              span.textContent = answers[q.id] === key ? ' Correct' : ' Correct answer';
+              span.className = 'result correct';
+              if (answers[q.id] === key) correct++;
+            }
+          });
+        });
+        var scoreRoot = document.getElementById('score-root');
+        scoreRoot.hidden = false;
+        scoreRoot.innerHTML = '<h2>Score: ' + correct + ' / ' + currentQuestions.length + '</h2><p>Real exam: ' + EXAM_SPEC.details.questionCount + ' questions, ' + EXAM_SPEC.details.durationMinutes + ' minutes.</p>';
+        document.getElementById('btn-submit').disabled = true;
+      }
+
+      function reset() {
+        document.querySelectorAll('input[type="radio"]').forEach(function (el) { el.checked = false; });
+        document.querySelectorAll('.options .result').forEach(function (el) { el.textContent = ''; el.className = 'result'; });
+        document.getElementById('score-root').hidden = true;
+        document.getElementById('score-root').innerHTML = '';
+        document.getElementById('btn-submit').disabled = false;
+      }
+
+      function startNewExam() {
+        currentQuestions = buildExamSet();
+        render(currentQuestions);
+        reset();
+        updateMetaLine();
+      }
+
+      document.getElementById('btn-new-exam').addEventListener('click', startNewExam);
+      document.getElementById('btn-submit').addEventListener('click', function () {
+        var answers = getAnswers();
+        showResults(answers);
+      });
+      document.getElementById('btn-reset').addEventListener('click', reset);
+
+      function loadBankFromFile(file) {
+        var reader = new FileReader();
+        reader.onload = function () {
+          try {
+            var data = JSON.parse(reader.result);
+            if (data.questions && data.questions.length) {
+              questionBank = data.questions;
+              onBankReady();
+            } else {
+              showLoadError('No "questions" array found in the file.');
+            }
+          } catch (e) {
+            showLoadError('Invalid JSON: ' + e.message);
+          }
+        };
+        reader.onerror = function () { showLoadError('Could not read file.'); };
+        reader.readAsText(file);
+      }
+
+      function showLoadError(extraMessage) {
+        var root = document.getElementById('questions-root');
+        root.innerHTML =
+          '<p class="load-error">' +
+          (extraMessage || 'Question bank could not be loaded from the network (e.g. when opening this file directly).') +
+          '<br>Load from your computer: <input type="file" id="load-questions-file" accept=".json,application/json" aria-label="Choose questions.json">' +
+          '</p>';
+        var input = document.getElementById('load-questions-file');
+        if (input) {
+          input.addEventListener('change', function (e) {
+            var f = e.target.files[0];
+            if (f) loadBankFromFile(f);
+          });
+        }
+      }
+
+      function onBankReady() {
+        updateMetaLine();
+        if (questionBank.length === 0) {
+          showLoadError();
+          return;
+        }
+        startNewExam();
+      }
+
+      fetch(QUESTIONS_JSON)
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.questions && data.questions.length) {
+            questionBank = data.questions;
+          }
+          onBankReady();
+        })
+        .catch(function () {
+          onBankReady();
+        });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,105 @@
+You are helping create practice questions for the ArcGIS Enterprise Administration Professional 2025 (EAEP_2025) exam.
+
+## Exam domains and weights (distribute questions accordingly)
+- **Deploy ArcGIS Enterprise** (34%): Apply Esri guidelines to install and configure an ArcGIS Enterprise deployment; Apply Esri best practices to configure security for ArcGIS Enterprise
+- **Troubleshoot ArcGIS Enterprise** (18%): Troubleshoot functional issues between ArcGIS Enterprise components; Interpret ArcGIS Enterprise logs to determine the causes of issues
+- **Maintain and Support ArcGIS Enterprise** (22%): Determine how to perform system health checks and maintain stability; Apply best practices to conduct backups and restorations
+- **Manage Content and Users in ArcGIS Enterprise** (26%): Explain how to configure service capabilities and properties to meet user requirements; Explain how to register on-premises or cloud-based data sources with ArcGIS Enterprise
+
+## Required JSON format for each question
+- "id": omit (will be assigned later)
+- "domainId": one of: deploy-enterprise, troubleshoot-enterprise, maintain-support-enterprise, manage-content-users
+- "text": question stem (one sentence, clear and specific)
+- "options": array of exactly 4 objects, each: { "key": "a"|"b"|"c"|"d", "text": "option text" }
+- "correctKey": "a"|"b"|"c"|"d" (the key of the correct option)
+
+## Example questions (match this structure exactly)
+[
+  {
+    "domainId": "troubleshoot-enterprise",
+    "text": "Users report that portal content loads successfully, but all hosted feature layers fail to draw. Which component should an administrator check first?",
+    "options": [
+      {
+        "key": "a",
+        "text": "ArcGIS Data Store"
+      },
+      {
+        "key": "b",
+        "text": "ArcGIS Web Adaptor"
+      },
+      {
+        "key": "c",
+        "text": "Portal for ArcGIS"
+      },
+      {
+        "key": "d",
+        "text": "ArcGIS License Manager"
+      }
+    ],
+    "correctKey": "a",
+    "id": "q1"
+  },
+  {
+    "domainId": "manage-content-users",
+    "text": "Which ArcGIS Enterprise component maintains the organization\u2019s item index for searching content?",
+    "options": [
+      {
+        "key": "a",
+        "text": "ArcGIS Server"
+      },
+      {
+        "key": "b",
+        "text": "ArcGIS Data Store"
+      },
+      {
+        "key": "c",
+        "text": "Portal for ArcGIS"
+      },
+      {
+        "key": "d",
+        "text": "ArcGIS Web Adaptor"
+      }
+    ],
+    "correctKey": "c",
+    "id": "q2"
+  },
+  {
+    "domainId": "deploy-enterprise",
+    "text": "A portal administrator wants to manage user access using existing enterprise identities. Which configuration supports this?",
+    "options": [
+      {
+        "key": "a",
+        "text": "Built-in authentication"
+      },
+      {
+        "key": "b",
+        "text": "Enterprise authentication"
+      },
+      {
+        "key": "c",
+        "text": "Token-based authentication only"
+      },
+      {
+        "key": "d",
+        "text": "Public access with no sign-in"
+      }
+    ],
+    "correctKey": "b",
+    "id": "q3"
+  }
+]
+
+## Task
+Generate exactly **400 new** practice questions for this exam. Rules:
+- Distribute by domain: about 34% deploy-enterprise, 18% troubleshoot-enterprise, 22% maintain-support-enterprise, 26% manage-content-users.
+- Each question must have exactly 4 options; one correct, three plausible distractors.
+- Do not repeat or rephrase the example questions above.
+- Do not duplicate the CertFun sample stems already in the bank as questions 1–10 (write original stems).
+- Use only the four domainId values listed.
+- Output **only** a JSON array of 400 objects. No markdown code fence, no explanation before or after. Start with [ and end with ].
+
+
+---
+Send this to the model (after pasting the prompt above):
+
+Generate exactly the number of questions requested above. Output only a JSON array of question objects, no markdown code fence and no explanation before or after. Start with [ and end with ]. Save the output as new_questions.json

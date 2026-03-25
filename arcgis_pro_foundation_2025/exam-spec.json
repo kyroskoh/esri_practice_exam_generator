@@ -1,0 +1,58 @@
+{
+  "examId": "EAPF_2025",
+  "title": "ArcGIS Pro Foundation 2025",
+  "certificationCode": "EAPF 2025",
+  "version": "2025",
+  "source": "EAPF2025_EIG_APR2025.pdf",
+  "details": {
+    "questionCount": 75,
+    "durationMinutes": 90,
+    "format": "Multiple Choice",
+    "language": "English"
+  },
+  "domains": [
+    {
+      "id": "data-management",
+      "name": "Data Management",
+      "weightPercent": 32,
+      "objectives": [
+        "Identify and access data properties and metadata",
+        "Identify supported ArcGIS data formats and the procedures necessary to create file geodatabases and feature classes",
+        "Determine the appropriate method of managing tabular data",
+        "Identify basic editing workflows that are necessary to create or modify features",
+        "Recognize the purpose and characteristics of geographic and projected coordinate systems"
+      ]
+    },
+    {
+      "id": "mapping-visualization",
+      "name": "Mapping and Visualization",
+      "weightPercent": 36,
+      "objectives": [
+        "Demonstrate familiarity with ArcGIS Pro interface",
+        "Recall how to modify layer symbology and labels",
+        "Demonstrate an understanding of how to configure map and layer properties",
+        "Identify the use and impact of scale on map layers",
+        "Identify the steps necessary for adding data"
+      ]
+    },
+    {
+      "id": "layouts-sharing",
+      "name": "Layouts and Sharing",
+      "weightPercent": 12,
+      "objectives": [
+        "Recall how to share content",
+        "Determine the appropriate method to share content from ArcGIS Pro"
+      ]
+    },
+    {
+      "id": "performing-analysis",
+      "name": "Performing Analysis",
+      "weightPercent": 20,
+      "objectives": [
+        "Determine the appropriate workflow for using proximity and overlay tools",
+        "Determine the correct workflow to select features interactively, by attributes or by location",
+        "Recall methods to find geographic locations"
+      ]
+    }
+  ]
+}

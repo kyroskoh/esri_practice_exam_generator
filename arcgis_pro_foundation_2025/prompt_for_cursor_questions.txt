@@ -1,0 +1,98 @@
+You are helping create practice questions for the ArcGIS Pro Foundation 2025 (EAPF_2025) exam.
+
+## Exam domains and weights (distribute questions accordingly)
+- **Data Management** (32%): Identify and access data properties and metadata; Identify supported ArcGIS data formats and the procedures necessary to create file geodatabases and feature classes
+- **Mapping and Visualization** (36%): Demonstrate familiarity with ArcGIS Pro interface; Recall how to modify layer symbology and labels
+- **Layouts and Sharing** (12%): Recall how to share content; Determine the appropriate method to share content from ArcGIS Pro
+- **Performing Analysis** (20%): Determine the appropriate workflow for using proximity and overlay tools; Determine the correct workflow to select features interactively, by attributes or by location
+
+## Required JSON format for each question
+- "id": omit (will be assigned later)
+- "domainId": one of: data-management, mapping-visualization, layouts-sharing, performing-analysis
+- "text": question stem (one sentence, clear and specific)
+- "options": array of exactly 4 objects, each: { "key": "a"|"b"|"c"|"d", "text": "option text" }
+- "correctKey": "a"|"b"|"c"|"d" (the key of the correct option)
+
+## Example questions (match this structure exactly)
+[
+  {
+    "id": "q01",
+    "domainId": "data-management",
+    "text": "What happens when you delete a feature from a feature class during an edit session?",
+    "options": [
+      {
+        "key": "a",
+        "text": "The feature is hidden but recoverable"
+      },
+      {
+        "key": "b",
+        "text": "The feature is permanently removed when edits are saved"
+      },
+      {
+        "key": "c",
+        "text": "The feature is archived automatically"
+      },
+      {
+        "key": "d",
+        "text": "The attribute table is preserved"
+      }
+    ],
+    "correctKey": "b"
+  },
+  {
+    "id": "q02",
+    "domainId": "data-management",
+    "text": "Where can you view and edit metadata for a dataset in ArcGIS Pro?",
+    "options": [
+      {
+        "key": "a",
+        "text": "Catalog pane"
+      },
+      {
+        "key": "b",
+        "text": "Contents pane"
+      },
+      {
+        "key": "c",
+        "text": "Map view"
+      },
+      {
+        "key": "d",
+        "text": "Layout view"
+      }
+    ],
+    "correctKey": "a"
+  },
+  {
+    "id": "q03",
+    "domainId": "data-management",
+    "text": "Which data type stores continuous surface information?",
+    "options": [
+      {
+        "key": "a",
+        "text": "Vector"
+      },
+      {
+        "key": "b",
+        "text": "Table"
+      },
+      {
+        "key": "c",
+        "text": "Annotation"
+      },
+      {
+        "key": "d",
+        "text": "Raster"
+      }
+    ],
+    "correctKey": "d"
+  }
+]
+
+## Task
+Generate exactly **100 new** practice questions for this exam. Rules:
+- Distribute by domain: about 32% data-management, 36% mapping-visualization, 12% layouts-sharing, 20% performing-analysis.
+- Each question must have exactly 4 options; one correct, three plausible distractors.
+- Do not repeat or rephrase the example questions above.
+- Use only the four domainId values listed.
+- Output **only** a JSON array of 100 objects. No markdown code fence, no explanation before or after. Start with [ and end with ]. Save the output as new_questions.json
