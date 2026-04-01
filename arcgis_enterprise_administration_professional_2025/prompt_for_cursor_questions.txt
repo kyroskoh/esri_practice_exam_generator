@@ -1,4 +1,4 @@
-You are helping create practice questions for the ArcGIS Enterprise Administration Professional 2025 (EAEP_2025) exam.
+You are helping create **high-difficulty** practice questions for the ArcGIS Enterprise Administration Professional 2025 (EAEP_2025) exam. The real exam often tests the **best** answer among several plausible ones—not merely a factually “possible” option.
 
 ## Exam domains and weights (distribute questions accordingly)
 - **Deploy ArcGIS Enterprise** (34%): Apply Esri guidelines to install and configure an ArcGIS Enterprise deployment; Apply Esri best practices to configure security for ArcGIS Enterprise
@@ -6,100 +6,106 @@ You are helping create practice questions for the ArcGIS Enterprise Administrati
 - **Maintain and Support ArcGIS Enterprise** (22%): Determine how to perform system health checks and maintain stability; Apply best practices to conduct backups and restorations
 - **Manage Content and Users in ArcGIS Enterprise** (26%): Explain how to configure service capabilities and properties to meet user requirements; Explain how to register on-premises or cloud-based data sources with ArcGIS Enterprise
 
+## Style: case-study and production realism (required)
+- Frame most stems as **short scenarios** with a realistic constraint (time window, security policy, load, migration, partial outage, org politics, wrong shortcut already tried). Do not prefix stems with the word “Case” or similar labels unless the scenario genuinely needs it.
+- Target **operational best practice** and **architecture** (federation, Web Adaptor/reverse proxy, TLS and trust, hosting server, data stores, SAML/OAuth, backups/upgrades, collaboration, registered data, identities). Avoid trivia that is only a single glossary definition unless embedded in a scenario.
+- Write **four plausible options**: wrong answers should sound credible—common admin mistakes, tempting shortcuts, true statements in the wrong context, or fixes that help in a different situation. **Do not** make three options obviously absurd.
+- **On-domain distractors (required):** Each wrong option must address the **same technical area** as the stem (e.g. TLS/cert scenarios → wrong answers about chain, binding, SNI/SAN, mixed content—not unrelated topics like data store registration or licensing unless the stem is about those). See repository `eaep_distractor_design.py` for the full policy.
+- The correct option should be the **most appropriate next step or explanation** for *this* scenario (best answer), per Esri-style deployment and troubleshooting guidance.
+- Stems may be **one or two sentences** if needed for context; keep reading time reasonable.
+
 ## Required JSON format for each question
 - "id": omit (will be assigned later)
 - "domainId": one of: deploy-enterprise, troubleshoot-enterprise, maintain-support-enterprise, manage-content-users
-- "text": question stem (one sentence, clear and specific)
+- "text": scenario stem (see Style above)
 - "options": array of exactly 4 objects, each: { "key": "a"|"b"|"c"|"d", "text": "option text" }
-- "correctKey": "a"|"b"|"c"|"d" (the key of the correct option)
+- "correctKey": "a"|"b"|"c"|"d" (the key of the **best** option for the scenario)
 
-## Example questions (match this structure exactly)
+## Example questions (structure only—match JSON shape; **do not** copy these stems)
 [
   {
-    "domainId": "troubleshoot-enterprise",
-    "text": "Users report that portal content loads successfully, but all hosted feature layers fail to draw. Which component should an administrator check first?",
+    "domainId": "deploy-enterprise",
+    "text": "A city runs Portal and ArcGIS Server on separate VMs. GIS staff federated the server, but ArcGIS Pro still shows only a direct server connection for publishing\u2014not the portal. The hosting server is set. What is the best next check?",
     "options": [
       {
         "key": "a",
-        "text": "ArcGIS Data Store"
+        "text": "Delete federation and use only built-in accounts."
       },
       {
         "key": "b",
-        "text": "ArcGIS Web Adaptor"
+        "text": "Reinstall ArcGIS Data Store on the portal machine."
       },
       {
         "key": "c",
-        "text": "Portal for ArcGIS"
+        "text": "Disable the Web Adaptor and use port 6443 only."
       },
       {
         "key": "d",
-        "text": "ArcGIS License Manager"
+        "text": "Confirm users sign in to Pro with the portal URL (same Web Adaptor URL the portal uses), not the raw ArcGIS Server URL."
       }
     ],
-    "correctKey": "a",
-    "id": "q1"
-  },
-  {
-    "domainId": "manage-content-users",
-    "text": "Which ArcGIS Enterprise component maintains the organization\u2019s item index for searching content?",
-    "options": [
-      {
-        "key": "a",
-        "text": "ArcGIS Server"
-      },
-      {
-        "key": "b",
-        "text": "ArcGIS Data Store"
-      },
-      {
-        "key": "c",
-        "text": "Portal for ArcGIS"
-      },
-      {
-        "key": "d",
-        "text": "ArcGIS Web Adaptor"
-      }
-    ],
-    "correctKey": "c",
-    "id": "q2"
+    "correctKey": "d"
   },
   {
     "domainId": "deploy-enterprise",
-    "text": "A portal administrator wants to manage user access using existing enterprise identities. Which configuration supports this?",
+    "text": "Your security team requires TLS 1.2+ and a public CA certificate for the portal URL. Browsers still warn \u201cnot secure.\u201d The .pfx is installed on the Web Adaptor host. What is the most likely production issue?",
     "options": [
       {
         "key": "a",
-        "text": "Built-in authentication"
+        "text": "Portal sharing is set to private only."
       },
       {
         "key": "b",
-        "text": "Enterprise authentication"
+        "text": "ArcGIS Server is not licensed."
       },
       {
         "key": "c",
-        "text": "Token-based authentication only"
+        "text": "The relational data store is not registered."
       },
       {
         "key": "d",
-        "text": "Public access with no sign-in"
+        "text": "The certificate chain or binding does not match the hostname and URL clients use (including SAN), or the site is still reached via HTTP."
       }
     ],
-    "correctKey": "b",
-    "id": "q3"
+    "correctKey": "d"
+  },
+  {
+    "domainId": "deploy-enterprise",
+    "text": "You federated a second ArcGIS Server site for raster analytics. Portal lists it, but image services fail when referenced from hosted web layers. What should you verify first?",
+    "options": [
+      {
+        "key": "a",
+        "text": "Install Portal on the raster server."
+      },
+      {
+        "key": "b",
+        "text": "The federated server is reachable from the hosting machine and data paths/credentials for registered stores are valid for that site."
+      },
+      {
+        "key": "c",
+        "text": "Merge both sites into one configuration directory."
+      },
+      {
+        "key": "d",
+        "text": "Disable HTTPS on the raster site."
+      }
+    ],
+    "correctKey": "b"
   }
 ]
 
 ## Task
-Generate exactly **400 new** practice questions for this exam. Rules:
-- Distribute by domain: about 34% deploy-enterprise, 18% troubleshoot-enterprise, 22% maintain-support-enterprise, 26% manage-content-users.
-- Each question must have exactly 4 options; one correct, three plausible distractors.
-- Do not repeat or rephrase the example questions above.
-- Do not duplicate the CertFun sample stems already in the bank as questions 1–10 (write original stems).
+Generate exactly **100 new** practice questions for this exam. Rules:
+- Distribute by domain: about **34%** deploy-enterprise, **18%** troubleshoot-enterprise, **22%** maintain-support-enterprise, **26%** manage-content-users.
+- Apply the **Style** section on every item: scenario-based, tricky plausible distractors, **best answer** discipline.
+- Each question: exactly 4 options; one correct key for the scenario; three **credible** wrong options (architecture traps, wrong first step, or right idea wrong context).
+- Do not repeat or lightly rephrase the example stems above or any stems already implied by the example block.
+- Do not duplicate CertFun-style **short definition** items unless rewritten as a full scenario with new specifics.
 - Use only the four domainId values listed.
-- Output **only** a JSON array of 400 objects. No markdown code fence, no explanation before or after. Start with [ and end with ].
+- Output **only** a JSON array of 100 objects. No markdown code fence, no explanation before or after. Start with [ and end with ].
 
 
 ---
 Send this to the model (after pasting the prompt above):
 
-Generate exactly the number of questions requested above. Output only a JSON array of question objects, no markdown code fence and no explanation before or after. Start with [ and end with ]. Save the output as new_questions.json
+Generate exactly the number of questions requested above. Follow the case-study / best-answer style in the Task section. Output only a JSON array of question objects, no markdown code fence and no explanation before or after. Start with [ and end with ]. Save the output as new_questions.json

@@ -83,6 +83,9 @@
     }
     .score-card h2 { font-size: 1rem; margin: 0 0 0.5rem; }
     .score-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .score-card p + p { margin-top: 0.5rem; }
+    .score-card.score-pass { border-left-color: var(--correct); }
+    .score-card.score-below { border-left-color: var(--incorrect); }
     footer { margin-top: 2rem; font-size: 0.75rem; color: var(--muted); }
     .load-error {
       background: var(--surface);
@@ -98,7 +101,7 @@
 <body>
   <div class="container">
     <h1>ArcGIS Enterprise Administration Professional 2025 (EAEP_2025) – Practice Test</h1>
-    <p class="meta" id="meta-line">Loading question bank… · 75 questions per exam / 105 min in real exam · Multiple choice</p>
+    <p class="meta" id="meta-line">Loading question bank… · 75 questions per exam / 105 min · passing score 65% (scored) · Multiple choice</p>
 
     <div id="questions-root"></div>
     <div id="score-root" class="score-card" hidden></div>
@@ -115,7 +118,7 @@
   <script>
     (function () {
       var QUESTIONS_JSON = 'questions.json';
-      var EXAM_SPEC = {"examId":"EAEP_2025","title":"ArcGIS Enterprise Administration Professional 2025","certificationCode":"EAEP 2025","version":"2025","source":"EAEP2025_EIG_JAN2026.pdf","details":{"questionCount":75,"durationMinutes":105,"format":"Multiple Choice","language":"English"},"domains":[{"id":"deploy-enterprise","name":"Deploy ArcGIS Enterprise","weightPercent":34,"objectives":[]},{"id":"troubleshoot-enterprise","name":"Troubleshoot ArcGIS Enterprise","weightPercent":18,"objectives":[]},{"id":"maintain-support-enterprise","name":"Maintain and Support ArcGIS Enterprise","weightPercent":22,"objectives":[]},{"id":"manage-content-users","name":"Manage Content and Users in ArcGIS Enterprise","weightPercent":26,"objectives":[]}]};
+      var EXAM_SPEC = {"examId":"EAEP_2025","title":"ArcGIS Enterprise Administration Professional 2025","certificationCode":"EAEP 2025","version":"2025","source":"EAEP2025_EIG_JAN2026.pdf","details":{"questionCount":75,"durationMinutes":105,"format":"Multiple Choice","language":"English","passingScorePercent":65},"domains":[{"id":"deploy-enterprise","name":"Deploy ArcGIS Enterprise","weightPercent":34,"objectives":[]},{"id":"troubleshoot-enterprise","name":"Troubleshoot ArcGIS Enterprise","weightPercent":18,"objectives":[]},{"id":"maintain-support-enterprise","name":"Maintain and Support ArcGIS Enterprise","weightPercent":22,"objectives":[]},{"id":"manage-content-users","name":"Manage Content and Users in ArcGIS Enterprise","weightPercent":26,"objectives":[]}]};
       var EXAM_QUESTION_COUNT = 75;
       var EXAM_DURATION_MIN = EXAM_SPEC.details.durationMinutes;
       var questionBank = [];
@@ -123,6 +126,11 @@
 
       var domainNames = {};
       EXAM_SPEC.domains.forEach(function (d) { domainNames[d.id] = d.name; });
+
+      function getPassingScorePercent() {
+        var d = EXAM_SPEC.details || {};
+        return d.passingScorePercent != null ? d.passingScorePercent : 65;
+      }
 
       function shuffleArray(arr) {
         var a = arr.slice();
@@ -171,7 +179,18 @@
       function updateMetaLine() {
         var el = document.getElementById('meta-line');
         if (!el) return;
-        el.textContent = 'Bank: ' + questionBank.length + ' questions · This exam: ' + currentQuestions.length + ' (random ' + EXAM_QUESTION_COUNT + ') · ' + EXAM_DURATION_MIN + ' min in real exam · Multiple choice';
+        el.textContent =
+          'Bank: ' +
+          questionBank.length +
+          ' questions · This exam: ' +
+          currentQuestions.length +
+          ' (random ' +
+          EXAM_QUESTION_COUNT +
+          ') · Real exam: ' +
+          EXAM_DURATION_MIN +
+          ' min · passing score ' +
+          getPassingScorePercent() +
+          '% (scored) · Multiple choice';
       }
 
       function render(questions) {
@@ -228,17 +247,40 @@
             }
           });
         });
+        var passPct = getPassingScorePercent();
+        var pct = currentQuestions.length ? Math.round((100 * correct) / currentQuestions.length) : 0;
+        var passed = pct >= passPct;
         var scoreRoot = document.getElementById('score-root');
         scoreRoot.hidden = false;
-        scoreRoot.innerHTML = '<h2>Score: ' + correct + ' / ' + currentQuestions.length + '</h2><p>Real exam: ' + EXAM_SPEC.details.questionCount + ' questions, ' + EXAM_SPEC.details.durationMinutes + ' minutes.</p>';
+        scoreRoot.className = 'score-card ' + (passed ? 'score-pass' : 'score-below');
+        scoreRoot.innerHTML =
+          '<h2>Score: ' +
+          correct +
+          ' / ' +
+          currentQuestions.length +
+          ' (' +
+          pct +
+          '%)</h2>' +
+          '<p><strong>' +
+          (passed ? 'At or above' : 'Below') +
+          '</strong> the typical EAEP passing threshold (' +
+          passPct +
+          '% scored).</p>' +
+          '<p>Real exam: ' +
+          EXAM_SPEC.details.questionCount +
+          ' questions, ' +
+          EXAM_SPEC.details.durationMinutes +
+          ' minutes.</p>';
         document.getElementById('btn-submit').disabled = true;
       }
 
       function reset() {
         document.querySelectorAll('input[type="radio"]').forEach(function (el) { el.checked = false; });
         document.querySelectorAll('.options .result').forEach(function (el) { el.textContent = ''; el.className = 'result'; });
-        document.getElementById('score-root').hidden = true;
-        document.getElementById('score-root').innerHTML = '';
+        var sr = document.getElementById('score-root');
+        sr.hidden = true;
+        sr.innerHTML = '';
+        sr.className = 'score-card';
         document.getElementById('btn-submit').disabled = false;
       }
 

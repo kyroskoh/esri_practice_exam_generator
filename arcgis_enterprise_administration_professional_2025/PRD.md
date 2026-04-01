@@ -2,75 +2,80 @@
 
 ## Purpose
 
-Provide a lightweight, offline-capable practice test for the **ArcGIS Enterprise Administration Professional 2025 (EAEP_2025)** certification exam. Users can run the test from a single HTML file and optional JSON question bank, without requiring a server or Node.js.
+Provide a lightweight, offline-capable practice test for the **ArcGIS Enterprise Administration Professional 2025 (EAEP_2025)** certification exam. Users run the test from HTML plus a JSON question bank (or a generated single-file standalone), without Node.js. **This product is unofficial study material**; see repository `LICENSING.md` for affiliation and trademark notices.
 
 ## Scope
 
-- **In scope:** Practice test UI, loading question bank (fetch, file picker, or embedded standalone), drawing 75 random questions per exam, randomizing question and option order, scoring, and displaying correct/incorrect answers; build script to produce a single-file standalone that works when opened via `file://` without fetch or file picker.
-- **Out of scope:** Timed exam mode, persistence of results, user accounts, or official Esri exam delivery.
+- **In scope:** Practice UI; load bank via `fetch`, file picker, or embedded standalone; **75** questions per attempt (matching real exam count); shuffle question order and option order; score and per-option feedback; Python scripts to build the bank and standalone HTML.
+- **Out of scope:** Timed mode, score persistence, accounts, proctoring, or official Esri exam delivery.
 
 ## Users
 
-- Candidates preparing for the EAEP_2025 exam.
-- Anyone reviewing ArcGIS Enterprise administration topics using the EIG-aligned question bank.
+- Candidates preparing for EAEP_2025.
+- Administrators who want **domain-weighted**, **scenario-style** practice aligned to the EIG.
 
 ## Goals
 
-1. Match real exam format: 75 questions, multiple choice, domain-aligned.
-2. Single source of truth for questions: `questions.json` (no embedded bank in the main `practice-test.html`).
-3. Work when the HTML file is opened directly (`file://`): either via file-picker fallback (two-file) or via a standalone build that embeds the bank so no fetch or picker is needed.
-4. Keep the app pure HTML/CSS/JS at runtime; optional one-time build (Python) to produce the standalone file.
+1. Match **real exam mechanics:** 75 questions per session, multiple choice, **105 minutes** on the label (timer not enforced in-app), **65% passing score (scored)** reflected in `exam-spec.json` and the submit score card.
+2. Match **EIG domain weights** within each authored segment of the **default question bank** (Deploy 34%, Troubleshoot 18%, Maintain and Support 22%, Manage Content and Users 26% on the 90-item core block and separately on the 400-item extended block).
+3. Prefer **best-answer** practice: plausible wrong options and production-relevant stems for scenario items—not only definitional recall.
+4. Single source of truth: **`questions.json`** for bank data; **`practice-test.html`** does not embed the bank; **`practice-test-standalone.html`** embeds it for `file://` use.
+5. Runtime: HTML/CSS/JS only; Python used **offline** to generate or merge JSON and to build the standalone file.
+
+## Question content (requirements)
+
+| Aspect | Requirement |
+|--------|-------------|
+| **Domains** | Items use `domainId` values from `exam-spec.json`: `deploy-enterprise`, `troubleshoot-enterprise`, `maintain-support-enterprise`, `manage-content-users`. |
+| **Default bank composition** | **1000** items: **10** scenario-style items from `old_questions.json`; **90** `SCENARIO_SPECS`; **400** `eaep_extra_400.py`; **100** `eaep_extra_100_case_study.py`; **200** `eaep_extra_200.py`; **100** `eaep_extra_100_ops.py`; **100** `eaep_extra_100_skills.py`; domain weights hold per segment where authored. |
+| **Scenario style** | Stems describe realistic constraints (operations, architecture, security, collaboration). Correct answer is the **most appropriate** action or explanation for the situation; distractors remain plausible. No mandatory `Case:` prefix on stems. |
+| **Opening block (q1–q10)** | First 10 questions in `old_questions.json` (scenario/case-study stems) are merged as **q1–q10** when running `build_eaep_scenario_bank.py`. |
+| **Supplementary generators** | `generate_questions.py` / `emit_bulk_questions.py` produce **template drill** items for volume; documented as lower fidelity than scenario bank for “exam feel.” |
+| **Cursor workflow** | `generate_questions_cursor.py` + `prompt_for_cursor_questions.txt` instruct models to emit **case-study / best-answer** JSON for merges. |
 
 ## Functional Requirements
 
 | ID | Requirement | Notes |
 |----|-------------|--------|
-| FR-1 | Load question bank from `questions.json` when the page is served over HTTP/HTTPS. | Uses `fetch(questions.json)`; same origin. |
-| FR-2 | When the page is opened as a local file and fetch fails, show a clear message and a file input so the user can select `questions.json` from disk. | FileReader API; applies to `practice-test.html`. |
-| FR-2b | Provide a standalone single-file build (`practice-test-standalone.html`) with the question bank embedded so the test works when opened via `file://` with no fetch or file picker. | Generated by `build_standalone.py` from `practice-test.html` and `questions.json`. |
-| FR-3 | Display exactly 75 questions per exam, drawn at random from the loaded bank. | `EXAM_QUESTION_COUNT = 75`; subset chosen randomly. |
-| FR-4 | Randomize the order of questions and the order of options (a–d) for each question, while preserving correct-answer mapping for grading. | Shuffle bank subset and option keys; `correctKey` updated per question. |
-| FR-5 | Allow the user to submit answers and see score plus per-option correct/incorrect feedback. | Submit button; score and inline result labels. |
-| FR-6 | Allow the user to reset answers (and score) for the current exam without changing the 75 questions. | Reset button. |
-| FR-7 | Allow the user to start a new exam (new random 75) from the loaded bank without reloading the page. | "New exam (random 75)" button. |
-| FR-8 | Show meta line: bank size, current exam size, duration, and format (e.g. "Bank: N questions · This exam: 75 (random 75) · 105 min in real exam · Multiple choice"). | `updateMetaLine()` driven by `questionBank.length`, `currentQuestions.length`, and `EXAM_SPEC.details.durationMinutes`. |
-| FR-9 | Display each question with domain tag, question text, and options with keys (a–d). | Rendered from `currentQuestions`; domain names from exam spec. |
+| FR-1 | Load `questions.json` over HTTP/HTTPS when served. | `fetch`; same origin. |
+| FR-2 | If `fetch` fails (`file://`), show error UI + file input to load JSON. | `practice-test.html`. |
+| FR-2b | Provide `practice-test-standalone.html` with embedded bank for `file://` without fetch or picker. | `build_standalone.py`. |
+| FR-3 | Each exam shows **75** questions drawn at random from the bank (or every item if the bank has fewer than 75). | `EXAM_QUESTION_COUNT = 75`. |
+| FR-4 | Shuffle order of selected questions and shuffle option keys **a–d** while preserving correct mapping. | Implemented in page script. |
+| FR-5 | Submit shows score and per-option correct/incorrect. | Submit + inline labels. |
+| FR-6 | Reset clears selections and score for current 75 without redraw. | Reset button. |
+| FR-7 | New exam draws a new random 75 without reload. | New exam button. |
+| FR-8 | Meta line shows bank size, current exam size, duration from `EXAM_SPEC`, format. | `updateMetaLine()`. |
+| FR-9 | Each item shows **domain tag** (human-readable name from spec), stem, four options **a–d**. | From `domainId` + `exam-spec` domains. |
 
 ## Data and Sources of Truth
 
-- **Exam structure:** `exam-spec.json` (and inline copy in `practice-test.html` for offline use). Defines exam id, title, question count (75), duration (105 min), and domains with weights (Deploy 34%, Troubleshoot 18%, Maintain and Support 22%, Manage Content and Users 26%).
-- **Question bank:** `questions.json`. Schema: `{ "questions": [ { "id", "domainId", "text", "options": [ { "key", "text" } ], "correctKey" } ] }`. The main HTML does not embed the bank; `practice-test-standalone.html` is generated with the bank embedded for `file://` use.
-- **Per-exam state:** In-memory only: `questionBank`, `currentQuestions`, and user selections. Not persisted.
+- **Exam structure:** `exam-spec.json` and inline spec in `practice-test.html`: 75 questions, 105 min, **passingScorePercent** 65, four domains with **weightPercent** and objectives.
+- **Question bank:** `questions.json` — `{ "examId", "source", "questions": [ { "id", "domainId", "text", "options", "correctKey" } ] }`.
+- **Scenario source code:** `build_eaep_scenario_bank.py` (`SCENARIO_SPECS`) + `eaep_extra_*.py` modules + CertFun rows from `old_questions.json`.
+- **Session state:** In-memory only; not persisted.
 
 ## Non-Functional Requirements
 
-- **Portability:** Single HTML file plus optional `questions.json`; runs in modern browsers.
-- **No hardcoded question data in the main HTML:** `practice-test.html` loads from `questions.json` or file picker. The standalone file is generated from that template with the bank injected by `build_standalone.py`.
-- **Error handling:** Invalid or empty JSON from file picker shows a clear error; empty bank shows load-error UI and does not call exam start.
+- **Portability:** Modern browsers; optional Python 3 for maintenance scripts.
+- **No embedded bank in main HTML template** except via `build_standalone.py` output.
+- **Errors:** Invalid JSON or empty bank → clear message; no silent exam start.
 
-## Scripts (question generation)
+## Scripts (maintenance)
 
-- **Helper:** Run `python generate_help.py --help` or `python generate_help.py -h` for a short usage summary of all generation and merge commands.
-- **Template-based (default one-liner):** Generate 100 questions (default) and merge into `questions.json`. Start is auto-detected from `questions.json` when `--start` is omitted:
-  ```bash
-  python generate_questions.py > new_questions.json 2>&1 && python generate_questions_cursor.py merge new_questions.json
-  ```
-  Use `--count N` to generate a different number. Optional: run `python build_standalone.py` afterward to refresh the standalone HTML.
-- **Cursor-assisted:** `generate_questions_cursor.py prompt [--count N]` writes a prompt to paste into Cursor Chat; save the model output to a file and run `generate_questions_cursor.py merge <file> [--count N]`. Examples:
-  ```bash
-  python generate_questions_cursor.py prompt --count 50
-  python generate_questions_cursor.py prompt -n 200
-  python generate_questions_cursor.py merge new_questions.json
-  python generate_questions_cursor.py merge new_questions.json --count 50
-  ```
+- **`build_eaep_scenario_bank.py`** — Rebuild `questions.json` (q1–q10 from `old_questions.json` + 90 scenarios + domain mix). Then **`build_standalone.py`**.
+- **`generate_help.py`** — Short usage for merge, Cursor, emit-bulk, rebuild.
+- **`generate_questions_cursor.py`** — `prompt` / `merge` / `wizard` for appending model-generated scenario-style JSON.
+- **`generate_questions.py`** — Template-only output for drills; merge optional.
+- **`emit_bulk_questions.py`** — Intro × template combinations for volume; merge optional.
 
 ## Constraints
 
-- Browsers block `fetch()` of other local files when the page is opened via `file://`. Options: (1) file-picker fallback in `practice-test.html`, or (2) use `practice-test-standalone.html` (built by `build_standalone.py`), which embeds the bank and needs no fetch or picker.
-- Question bank must be valid JSON with a `questions` array; each question must have `id`, `domainId`, `text`, `options`, and `correctKey`.
+- Local `file://` cannot `fetch` sibling JSON; use standalone build or file picker.
+- Each question must include `id`, `domainId`, `text`, four `options`, `correctKey`.
 
 ## References
 
 - [Esri Academy – ArcGIS Enterprise Administration Professional 2025](https://www.esri.com/training/catalog/67e2da62d6844f1703724c6f/arcgis-enterprise-administration-professional-2025/)
-- EAEP2025 Exam Information Guide (EAEP2025_EIG_JAN2026.pdf) – local; [download from Esri Community](https://community.esri.com/t5/esri-technical-certification-exams/eaep-2025-eig/ba-p/1595261)
-- CertFun EAEP_2025 sample questions (questions 1–10 in `questions.json`, with a fourth option added; see README)
+- [EAEP 2025 EIG (PDF)](https://community.esri.com/t5/esri-technical-certification-exams/eaep-2025-eig/ba-p/1595261)
+- q1–q10 source: first 10 rows of `old_questions.json` (described in `questions.json` `source` string)
