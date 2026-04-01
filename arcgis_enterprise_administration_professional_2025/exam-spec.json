@@ -8,7 +8,8 @@
     "questionCount": 75,
     "durationMinutes": 105,
     "format": "Multiple Choice",
-    "language": "English"
+    "language": "English",
+    "passingScorePercent": 65
   },
   "domains": [
     {

@@ -21,6 +21,9 @@ Cursor-assisted (prompt + merge):
   python generate_questions_cursor.py merge <file> [--count N]
   python generate_questions_cursor.py --help
 
+Rebuild scenario + CertFun bank (100 questions, fixed domain mix):
+  python build_eaep_scenario_bank.py && python build_standalone.py
+
 Bulk emit (unique vs existing bank):
   python emit_bulk_questions.py --count 400 > new_questions.json && python generate_questions_cursor.py merge new_questions.json
 

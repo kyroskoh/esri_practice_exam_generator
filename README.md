@@ -29,7 +29,7 @@ Direct links to the standalone practice tests (question bank embedded in the pag
 ## Requirements
 
 - **To take a practice:** a modern browser (Chrome, Edge, Firefox, Safari).
-- **To rebuild the standalone HTML or merge new questions:** Python 3. See each folder’s README for commands (`build_standalone.py`, `generate_questions_cursor.py`, `emit_bulk_questions.py`).
+- **To rebuild the standalone HTML or merge new questions:** Python 3. See each folder’s README (for example `build_standalone.py`, `build_eaep_scenario_bank.py` for EAEP, `generate_questions_cursor.py`, `emit_bulk_questions.py`).
 
 ## Developer
 

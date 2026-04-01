@@ -18,8 +18,8 @@ import sys
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 NEW_QUESTIONS_BASENAME = "new_questions.json"
 CURSOR_INSTRUCTION = (
-    'Generate exactly the number of questions requested above. Output only a JSON array '
-    'of question objects, no markdown code fence and no explanation before or after. Start with [ and end with ]. '
+    'Generate exactly the number of questions requested above. Follow the case-study / best-answer style in the Task section. '
+    'Output only a JSON array of question objects, no markdown code fence and no explanation before or after. Start with [ and end with ]. '
     'Save the output as new_questions.json'
 )
 QUESTIONS_PATH = os.path.join(SCRIPT_DIR, "questions.json")
@@ -52,7 +52,17 @@ def write_prompt(count, skip_content=False):
     questions = data.get("questions", [])
     next_num = len(questions) + 1
     end_num = next_num + count - 1
-    examples = questions[:3] if len(questions) >= 3 else questions
+    # Prefer scenario-style examples (after CertFun block) when the bank includes them
+    if len(questions) >= 13:
+        examples_raw = questions[10:13]
+    else:
+        examples_raw = questions[:3] if len(questions) >= 3 else questions
+
+    def _example_obj(q):
+        out = {k: v for k, v in q.items() if k != "id"}
+        return out
+
+    examples = [_example_obj(q) for q in examples_raw]
 
     domain_block = "\n".join(
         "- **{}** ({}%): {}".format(
@@ -64,27 +74,35 @@ def write_prompt(count, skip_content=False):
 
     domain_id_list = ", ".join(DOMAIN_IDS)
 
-    prompt = """You are helping create practice questions for the ArcGIS Enterprise Administration Professional 2025 (EAEP_2025) exam.
+    prompt = """You are helping create **high-difficulty** practice questions for the ArcGIS Enterprise Administration Professional 2025 (EAEP_2025) exam. The real exam often tests the **best** answer among several plausible ones—not merely a factually “possible” option.
 
 ## Exam domains and weights (distribute questions accordingly)
 {domain_block}
 
+## Style: case-study and production realism (required)
+- Frame most stems as **short scenarios** with a realistic constraint (time window, security policy, load, migration, partial outage, org politics, wrong shortcut already tried). Do not prefix stems with the word “Case” or similar labels unless the scenario genuinely needs it.
+- Target **operational best practice** and **architecture** (federation, Web Adaptor/reverse proxy, TLS and trust, hosting server, data stores, SAML/OAuth, backups/upgrades, collaboration, registered data, identities). Avoid trivia that is only a single glossary definition unless embedded in a scenario.
+- Write **four plausible options**: wrong answers should sound credible—common admin mistakes, tempting shortcuts, true statements in the wrong context, or fixes that help in a different situation. **Do not** make three options obviously absurd.
+- The correct option should be the **most appropriate next step or explanation** for *this* scenario (best answer), per Esri-style deployment and troubleshooting guidance.
+- Stems may be **one or two sentences** if needed for context; keep reading time reasonable.
+
 ## Required JSON format for each question
 - "id": omit (will be assigned later)
 - "domainId": one of: {domain_id_list}
-- "text": question stem (one sentence, clear and specific)
+- "text": scenario stem (see Style above)
 - "options": array of exactly 4 objects, each: {{ "key": "a"|"b"|"c"|"d", "text": "option text" }}
-- "correctKey": "a"|"b"|"c"|"d" (the key of the correct option)
+- "correctKey": "a"|"b"|"c"|"d" (the key of the **best** option for the scenario)
 
-## Example questions (match this structure exactly)
+## Example questions (structure only—match JSON shape; **do not** copy these stems)
 {examples}
 
 ## Task
 Generate exactly **{count} new** practice questions for this exam. Rules:
-- Distribute by domain: about 34% deploy-enterprise, 18% troubleshoot-enterprise, 22% maintain-support-enterprise, 26% manage-content-users.
-- Each question must have exactly 4 options; one correct, three plausible distractors.
-- Do not repeat or rephrase the example questions above.
-- Do not duplicate the CertFun sample stems already in the bank as questions 1–10 (write original stems).
+- Distribute by domain: about **34%** deploy-enterprise, **18%** troubleshoot-enterprise, **22%** maintain-support-enterprise, **26%** manage-content-users.
+- Apply the **Style** section on every item: scenario-based, tricky plausible distractors, **best answer** discipline.
+- Each question: exactly 4 options; one correct key for the scenario; three **credible** wrong options (architecture traps, wrong first step, or right idea wrong context).
+- Do not repeat or lightly rephrase the example stems above or any stems already implied by the example block.
+- Do not duplicate CertFun-style **short definition** items unless rewritten as a full scenario with new specifics.
 - Use only the four domainId values listed.
 - Output **only** a JSON array of {count} objects. No markdown code fence, no explanation before or after. Start with [ and end with ].
 

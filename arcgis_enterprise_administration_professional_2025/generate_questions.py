@@ -1,7 +1,18 @@
 #!/usr/bin/env python3
 """
-Generate additional EAEP 2025 practice questions. Aligns to EIG domains.
-Original stems only (not copied from third-party sample banks).
+Generate additional EAEP 2025 practice questions from **fixed templates** (short factual stems).
+
+This path is **not** the same as the **case-study / best-answer** bank used for exam-like
+scenarios. For those, use:
+  - `build_eaep_scenario_bank.py` (rebuilds questions.json with CertFun + scenario items), and/or
+  - `generate_questions_cursor.py prompt` (prompt tuned for tricky scenarios in
+    `prompt_for_cursor_questions.txt`).
+
+`emit_bulk_questions.py` combines **intro phrases** with these same templates to add volume;
+merge output is still template-style, not full case studies.
+
+Templates below align to EIG **domains**; difficulty is drill-level. Original stems only
+(not copied from third-party sample banks).
 
   python generate_questions.py
   python generate_questions.py > new_questions.json 2>&1 && python generate_questions_cursor.py merge new_questions.json
@@ -19,6 +30,8 @@ def q(domain, text, correct, w1, w2, w3):
     return (domain, text, [correct, w1, w2, w3], 0)
 
 
+# Template drills — factual / single-sentence style. For scenario stems, extend via
+# build_eaep_scenario_bank.py (SCENARIO_SPECS) or Cursor merge, not by mixing styles here.
 # (domain, text, options[correct,...wrong], correct_index=0)
 TEMPLATES = [
     # Deploy ArcGIS Enterprise (~34%)
@@ -51,15 +64,15 @@ TEMPLATES = [
     q("deploy-enterprise", "Which item describes the ArcGIS Notebook Server role?", "Hosts ArcGIS Notebooks in the portal ecosystem when licensed and configured", "Stores hosted feature geometry only", "Replaces ArcGIS Web Adaptor", "Manages Active Directory forests"),
     # Troubleshoot (~18%)
     q("troubleshoot-enterprise", "Which log level captures the most verbose diagnostic detail for short-term troubleshooting?", "Debug", "Severe only", "Warning only", "Off"),
-    q("troubleshoot-enterprise", "Where should an administrator first look when a map service fails to start after a data path change?", "Server logs and the registered data store path validation", "Only the portal search index", "Browser favorites", "The layout legend in ArcGIS Pro"),
+    q("troubleshoot-enterprise", "Where should an administrator first look when a map service fails to start after a data path change?", "Server logs and the registered data store path validation", "Only the portal search index", "Browser favorites", "The ArcGIS Pro project’s map frame name only"),
     q("troubleshoot-enterprise", "Users report slow map draws on a busy map service. What is a reasonable first check?", "Service instance settings, cache usage, and underlying data performance", "Delete the portal", "Remove SSL certificates", "Disable the relational data store"),
-    q("troubleshoot-enterprise", "If the portal shows a generic error after an upgrade, what should you review first?", "Portal and server logs around the upgrade window", "Only client GPU drivers", "Shapefile spatial indexes only", "North arrow symbology"),
+    q("troubleshoot-enterprise", "If the portal shows a generic error after an upgrade, what should you review first?", "Portal and server logs around the upgrade window", "Only client GPU drivers", "Shapefile spatial indexes only", "Portal organization featured content item count"),
     q("troubleshoot-enterprise", "Intermittent token errors from apps often relate to:", "Clock skew, reverse proxy headers, or Web Adaptor/HTTPS misconfiguration", "Too many layout elements", "Raster pyramids only", "Geodatabase topology rules"),
     q("troubleshoot-enterprise", "A hosted scene layer fails to build. Which component is most relevant to verify?", "Tile cache data store health and space", "Only the print service", "KML network links", "CSV delimiters"),
     q("troubleshoot-enterprise", "What does HTTP 504 from a Web Adaptor often suggest?", "Timeout at the web tier or upstream server overload", "Successful cache hit", "Valid license file", "Empty geodatabase"),
     q("troubleshoot-enterprise", "To trace a specific map request, which approach is appropriate?", "Enable temporary verbose or request-level logging, reproduce, then reduce logging", "Delete all logs permanently", "Disable authentication forever", "Reinstall the OS"),
-    q("troubleshoot-enterprise", "If federated server shows 'not reachable' in portal, what should you verify?", "Network reachability, certificates, and Web Adaptor registration URLs", "Only the map scale", "Field domains in a file GDB", "Layout page size"),
-    q("troubleshoot-enterprise", "Performance degrades after bulk publishing. What should you check?", "Server resources, instance max/min, and database load", "Only the basemap color", "Number of north arrows", "CSV row count in Catalog"),
+    q("troubleshoot-enterprise", "If federated server shows 'not reachable' in portal, what should you verify?", "Network reachability, certificates, and Web Adaptor registration URLs", "Only the map scale denominator in the web map JSON", "Field domains in a file GDB", "Layout page size in the print template"),
+    q("troubleshoot-enterprise", "Performance degrades after bulk publishing. What should you check?", "Server resources, instance max/min, and database load", "Basemap drawing order in the web map only", "Number of layers in the map document only", "CSV row count in Catalog"),
     q("troubleshoot-enterprise", "Which symptom might indicate the relational data store is stopped or unreachable?", "Failures creating or accessing hosted feature layers", "Only legend font changes", "PDF export margins", "Geocode score display"),
     q("troubleshoot-enterprise", "What is a safe practice after intensive troubleshooting logging?", "Return log levels to standard settings to avoid disk fill and overhead", "Leave Debug on indefinitely", "Delete configuration store", "Block all firewall ports"),
     q("troubleshoot-enterprise", "If printing fails from the portal, which service is most relevant?", "PrintingTools or custom print geoprocessing services", "Hosted tile layer only", "Scene viewer lighting", "Spatial reference names"),
@@ -67,16 +80,16 @@ TEMPLATES = [
     # Maintain and support (~22%)
     q("maintain-support-enterprise", "Which Esri tool is designed to export and restore a Web GIS deployment (portal, server, data store metadata)?", "WebGISDR", "Buffer geoprocessing tool", "Topo to Raster", "XY To Line"),
     q("maintain-support-enterprise", "Before major operating system patches on servers hosting ArcGIS Enterprise, what is a recommended step?", "Take a full backup consistent with Esri guidance and verify recovery procedures", "Delete all hosted layers", "Remove federation", "Disable HTTPS"),
-    q("maintain-support-enterprise", "Where can administrators monitor overall portal health and logs in a supported workflow?", "Portal Administrator logs and ArcGIS Server Manager diagnostics", "Only Windows Paint", "Shapefile .cpg files", "Maplex label engine only"),
-    q("maintain-support-enterprise", "What should be validated after restoring from backup?", "Portal and server URLs, services, hosted content, and data store registration", "Only the map rotation angle", "Legend patch size", "Basemap opacity in one project"),
+    q("maintain-support-enterprise", "Where can administrators monitor overall portal health and logs in a supported workflow?", "Portal Administrator logs and ArcGIS Server Manager diagnostics", "Windows Event Viewer only without reviewing portal or server logs", "Shapefile .cpg files", "Maplex label engine only"),
+    q("maintain-support-enterprise", "What should be validated after restoring from backup?", "Portal and server URLs, services, hosted content, and data store registration", "Only the default rotation of the data frame in saved maps", "Legend patch size in exported PDFs only", "Basemap opacity in one Pro project only"),
     q("maintain-support-enterprise", "When upgrading ArcGIS Enterprise, which guideline is most important?", "Follow Esri-ordered upgrade steps for portal, server, and data store versions", "Upgrade clients only and skip server", "Mix major versions indefinitely", "Delete backups before upgrade"),
     q("maintain-support-enterprise", "Why clear the REST cache in ArcGIS Server during some administrative changes?", "To ensure clients receive updated service definitions and capabilities", "To delete all maps", "To remove SSL", "To shrink file geodatabases"),
     q("maintain-support-enterprise", "Scheduled maintenance windows should include:", "Communication, rollback plan, and verification tests", "Only rebooting without notice", "Deleting the content directory", "Removing all groups"),
     q("maintain-support-enterprise", "Disk space planning for the tile cache data store should account for:", "Growth of hosted tile and scene caches", "Only email attachments", "ArcGIS Pro layout sizes", "KML icon URLs"),
-    q("maintain-support-enterprise", "After adding RAM to ArcGIS Server machines, what might you revisit?", "Instance pooling and process memory settings per Esri tuning guidance", "Field precision in shapefiles", "Map rotation", "Label halos only"),
+    q("maintain-support-enterprise", "After adding RAM to ArcGIS Server machines, what might you revisit?", "Instance pooling and process memory settings per Esri tuning guidance", "Field precision in shapefiles", "Web adaptor thread count only", "Label halos only"),
     q("maintain-support-enterprise", "Which practice supports stable database connections for enterprise geodatabase services?", "Use supported RDBMS versions, connection pooling, and timely patching", "Store passwords in plain text in maps", "Use retired DB versions", "Share sa passwords publicly"),
     q("maintain-support-enterprise", "What is a key reason to keep portal and ArcGIS Server versions aligned with ArcGIS Data Store?", "Compatibility matrices require matching supported combinations", "They never need to match", "Only the Web Adaptor version matters", "Only ArcGIS Monitor version matters"),
-    q("maintain-support-enterprise", "For service performance tuning, increasing what can reduce wait under concurrent load (within hardware limits)?", "Maximum instances of high-load services", "The number of north arrows on layouts", "PDF DPI for all exports", "Topology rules count"),
+    q("maintain-support-enterprise", "For service performance tuning, increasing what can reduce wait under concurrent load (within hardware limits)?", "Maximum instances of high-load services", "The number of layout elements on the MXD", "PDF DPI for all exports", "Topology rules count"),
     q("maintain-support-enterprise", "Which item should be included in operational runbooks?", "Contact paths, backup schedules, upgrade history, and DR steps", "Only personal social media", "Random map bookmarks", "Unused layer files"),
     q("maintain-support-enterprise", "Why monitor antivirus exclusions carefully on ArcGIS Enterprise hosts?", "Scanning config and data directories can lock files and degrade performance", "Antivirus improves portal search", "Exclusions delete logs", "It replaces backups"),
     q("maintain-support-enterprise", "What should you verify after certificate renewal on the Web Adaptor?", "Portal and server trust the chain and clients connect without warnings", "Only the map extent", "Geodatabase domains", "Label stacking"),
@@ -97,7 +110,7 @@ TEMPLATES = [
     q("manage-content-users", "When a service definition references a copied database on another machine, you must:", "Update data store registration and connection properties to valid paths", "Only change symbology", "Rename the layout", "Clear the portal index only"),
     q("manage-content-users", "Which practice improves content discoverability without changing permissions?", "Use clear titles, tags, and categories", "Hide all metadata", "Remove thumbnails", "Delete descriptions"),
     q("manage-content-users", "Deleting a portal user who owns groups may require:", "Transferring ownership or reassigning content first", "Nothing; groups auto-delete harmlessly always", "Reinstalling ArcGIS Pro on all clients", "Removing SSL"),
-    q("manage-content-users", "For hosted feature layers, schema changes visible to consumers often require:", "Republishing or using supported admin workflows for layer definition updates", "Only changing map rotation", "Editing PDF exports", "Renaming .mxd files"),
+    q("manage-content-users", "For hosted feature layers, schema changes visible to consumers often require:", "Republishing or using supported admin workflows for layer definition updates", "Only changing the web map’s initial extent", "Editing PDF exports", "Renaming .mxd files"),
     q("manage-content-users", "Which option describes a collaboration host?", "The portal that creates the collaboration and invites participants", "Any random laptop", "Only ArcGIS Online by policy", "The database sa login"),
     q("manage-content-users", "OAuth apps registered with the portal require:", "Appropriate redirect URIs and client type settings", "A shared sa password", "Removal of Web Adaptor", "Public anonymous access only"),
     q("manage-content-users", "To restrict who can create custom roles, you rely on:", "Portal administrative privileges and organization security policies", "File geodatabase domains", "Maplex settings", "CSV primary keys"),
@@ -105,11 +118,11 @@ TEMPLATES = [
     q("deploy-enterprise", "The default installation creates an ArcGIS Server site with what relationship to Portal before federation?", "Standalone site that can later be federated", "Always pre-federated with no option", "Only a file share", "Only ArcGIS Online"),
     q("deploy-enterprise", "Which statement about the portal WebContext URL is most accurate?", "It should match how users reach the site through load balancers or Web Adaptors", "It must always use port 6080", "It is optional and unused", "It replaces database TNS names"),
     q("deploy-enterprise", "ArcGIS Enterprise on Linux commonly pairs Portal and Server with:", "Supported web servers and Java Web Adaptor deployments per documentation", "Only IIS", "Only Microsoft Access", "Only shapefiles"),
-    q("deploy-enterprise", "When choosing server roles for raster analytics, you consider:", "Imagery volume, analysis patterns, and separate federated server sizing", "Only label halos", "Only CSV encoding", "North arrow fonts"),
+    q("deploy-enterprise", "When choosing server roles for raster analytics, you consider:", "Imagery volume, analysis patterns, and separate federated server sizing", "Only label halos", "Only CSV encoding", "Raster output format for exports only"),
     q("deploy-enterprise", "Reverse proxy headers must be configured correctly to avoid:", "Incorrect redirect URLs and broken OAuth flows", "Better performance", "Valid SSL", "Hosted layer creation"),
     q("deploy-enterprise", "The ArcGIS Data Store service account must have permissions to:", "Its local directories and connectivity to dependent components", "Nothing; it uses anonymous access", "Only read email", "Only USB devices"),
     # Additional troubleshoot
-    q("troubleshoot-enterprise", "If only some layers fail in a web map, check:", "Individual service URLs, permissions, and layer item settings", "Only the portal home page theme", "Geodatabase topology only", "Map rotation"),
+    q("troubleshoot-enterprise", "If only some layers fail in a web map, check:", "Individual service URLs, permissions, and layer item settings", "Only the portal home page organization description text", "Geodatabase topology only", "Web map bookmark order only"),
     q("troubleshoot-enterprise", "Database authentication failures in server logs often point to:", "Bad credentials, expired passwords, or incorrect data store registration", "Legend patch gaps", "WMS styles", "Label stacking"),
     q("troubleshoot-enterprise", "High CPU on the hosting machine may correlate with:", "Heavy geoprocessing, many service instances, or inefficient queries", "Thumbnail sizes only", "KML name length", "Layout guides"),
     # Additional maintain
@@ -119,7 +132,7 @@ TEMPLATES = [
     # Additional manage
     q("manage-content-users", "Content status (e.g., delete protection) can help:", "Prevent accidental deletion of critical web layers", "Force public sharing", "Remove SSL", "Disable logging"),
     q("manage-content-users", "Group managers can typically:", "Invite users and curate items shared to the group", "Reinstall ArcGIS Server silently", "Renew CA certificates automatically", "Patch the RDBMS"),
-    q("manage-content-users", "Linking portal members to enterprise groups often uses:", "Group mapping from the identity provider where configured", "Manual copying of shapefiles", "Random GUID assignment", "North arrow rotation"),
+    q("manage-content-users", "Linking portal members to enterprise groups often uses:", "Group mapping from the identity provider where configured", "Manual copying of shapefiles", "Random GUID assignment", "Portal group sort order in the UI"),
 ]
 
 
